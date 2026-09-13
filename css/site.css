@@ -208,7 +208,7 @@
 @media (max-width:700px){ .why-grid{ grid-template-columns:1fr; } }
 
 /* ---------- PILLARS (dark 4-up feature band) ---------- */
-.pillars-band{ background:var(--paper); padding-block:clamp(48px,6vw,72px); }
+.pillars-band{ background:var(--paper-2); padding-block:clamp(48px,6vw,72px); }
 .pillars-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:20px; }
 .pillar{
   display:flex; align-items:flex-start; gap:16px; text-align:left;
