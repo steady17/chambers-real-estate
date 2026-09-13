@@ -64,8 +64,9 @@ table.admin-table tr:last-child td{ border-bottom:0; }
 
 @media (max-width:960px){
   .admin-shell{ grid-template-columns:1fr; }
-  .admin-sidebar{ position:static; height:auto; display:flex; align-items:center; overflow-x:auto; }
+  .admin-sidebar{ position:static; height:auto; display:flex; align-items:center; overflow-x:auto; min-width:0; }
   .admin-nav{ flex-direction:row; }
   .admin-brand{ padding:0 14px 0 0; }
   .admin-form{ grid-template-columns:1fr; }
+  .admin-main{ min-width:0; }
 }
