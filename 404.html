@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page Not Found | Chambers Real Estate</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/site.css">
+<link rel="icon" type="image/png" href="img/logo-symbol-dark.png">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="brand"><img src="img/logo-full-ink.png" alt="Chambers Real Estate" class="brand-logo-img"></a>
+    <div class="nav-links">
+      <a href="index.html" data-nav="index.html">Home</a>
+      <a href="properties.html" data-nav="properties.html">Properties</a>
+      <a href="developments.html" data-nav="developments.html">Developments</a>
+      <a href="services.html" data-nav="services.html">Services</a>
+      <a href="list-property.html" data-nav="list-property.html">List Property</a>
+      <a href="about.html" data-nav="about.html">About</a>
+      <a href="contact.html" data-nav="contact.html">Contact</a>
+    </div>
+    <div class="nav-cta">
+      <a href="contact.html" class="btn btn-clay btn-sm">Enquire</a>
+      <button class="nav-burger" aria-label="Open menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="nav-scrim"></div>
+</nav>
+
+<section class="section" style="padding-block:120px; text-align:center;">
+  <div class="wrap">
+    <span class="eyebrow">404</span>
+    <h1 style="margin-bottom:14px;">This page has moved or doesn't exist.</h1>
+    <p class="muted" style="max-width:52ch; margin:0 auto 32px;">The listing or page you're looking for may have been taken down, sold, or the link may be out of date. Here's where you can go instead.</p>
+    <div class="hero-actions" style="justify-content:center;">
+      <a href="index.html" class="btn btn-primary">Back to Home</a>
+      <a href="properties.html" class="btn btn-ghost">Browse Properties</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><img src="img/logo-full-white.png" alt="Chambers Real Estate" class="brand-logo-img brand-logo-img-footer"></div>
+        <p>Your Ultimate Source of Excellence.<br>Kano, Nigeria.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="properties.html">Properties</a></li>
+          <li><a href="developments.html">Developments</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="list-property.html">List Property</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Get in touch</h4>
+        <ul>
+          <li><span id="f-phone"></span></li>
+          <li><a href="mailto:chambersrestate@gmail.com" id="f-email"></a></li>
+          <li><span id="f-addr"></span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Chambers Real Estate. All rights reserved.</span>
+      <span>Your Ultimate Source of Excellence</span>
+      <span>CAC Registered &middot; RC 1825810</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/config.js"></script>
+<script src="js/site-settings-loader.js"></script>
+<script src="js/main.js"></script>
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+  (async () => {
+    await loadSiteSettings();
+    document.getElementById("f-phone").textContent = CHAMBERS_CONFIG.phoneDisplay;
+    document.getElementById("f-email").textContent = CHAMBERS_CONFIG.email;
+    document.getElementById("f-addr").textContent = CHAMBERS_CONFIG.officeAddress;
+  })();
+</script>
+</body>
+</html>

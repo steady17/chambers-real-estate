@@ -1,0 +1,541 @@
+/**
+ * CHAMBERS ADMIN — connected to Supabase
+ * -----------------------------------------------------------------
+ * This dashboard now reads and writes directly to the live Supabase
+ * database (see ../js/supabase-config.js for the connection). Every
+ * add, edit, delete, and feature-toggle here updates the real
+ * database immediately, and shows up on the live website too.
+ * -----------------------------------------------------------------
+ */
+
+function mapRowToProperty(row){
+  return { ...row, priceSub: row.price_sub, titleDoc: row.title_doc, status: row.availability, gallery: row.gallery || [], features: row.features || [] };
+}
+function propertyToRow(p){
+  return {
+    id: p.id, name: p.name, location: p.location, price: p.price, price_sub: p.priceSub,
+    purpose: p.purpose, type: p.type, bedrooms: p.bedrooms, bathrooms: p.bathrooms,
+    toilets: p.toilets, parking: p.parking, size: p.size, condition: p.condition,
+    title_doc: p.titleDoc, availability: p.availability, negotiable: !!p.negotiable,
+    featured: !!p.featured, image: p.image, gallery: p.gallery, description: p.description,
+    features: p.features,
+  };
+}
+
+/* ---------- Data layer (live Supabase calls) ---------- */
+async function adminGetProperties(){
+  const { data, error } = await chambersDB.from("properties").select("*").order("created_at", { ascending:false });
+  if(error){ console.error(error); adminToast("Could not load properties — check your connection"); return []; }
+  return data.map(mapRowToProperty);
+}
+async function adminGetDevelopments(){
+  const { data, error } = await chambersDB.from("developments").select("*").order("created_at", { ascending:false });
+  if(error){ console.error(error); adminToast("Could not load developments — check your connection"); return []; }
+  return data;
+}
+async function adminDeleteDevelopment(id){
+  const { error } = await chambersDB.from("developments").delete().eq("id", id);
+  if(error){ console.error(error); adminToast("Delete failed — check your connection"); return false; }
+  return true;
+}
+async function adminDeleteEnquiry(id){
+  const { error } = await chambersDB.from("enquiries").delete().eq("id", id);
+  if(error){ console.error(error); adminToast("Delete failed — check your connection"); return false; }
+  return true;
+}
+async function adminDeleteListing(id){
+  const { error } = await chambersDB.from("listing_submissions").delete().eq("id", id);
+  if(error){ console.error(error); adminToast("Delete failed — check your connection"); return false; }
+  return true;
+}
+async function adminUpsertDevelopment(dev){
+  const { error } = await chambersDB.from("developments").upsert(dev);
+  if(error){ console.error(error); adminToast("Save failed — check your connection"); return false; }
+  return true;
+}
+
+/* ---------- Site settings ---------- */
+async function adminGetSettings(){
+  const { data, error } = await chambersDB.from("site_settings").select("*").eq("id", "main").single();
+  if(error){ console.error(error); return null; }
+  return data;
+}
+async function adminSaveSettings(settings){
+  const { error } = await chambersDB.from("site_settings").upsert({ id: "main", ...settings });
+  if(error){ console.error(error); adminToast("Save failed — check your connection"); return false; }
+  return true;
+}
+async function adminGetEnquiries(){
+  const { data, error } = await chambersDB.from("enquiries").select("*").order("created_at", { ascending:false });
+  if(error){ console.error(error); adminToast("Could not load enquiries — check your connection"); return []; }
+  return data;
+}
+async function adminGetListings(){
+  const { data, error } = await chambersDB.from("listing_submissions").select("*").order("created_at", { ascending:false });
+  if(error){ console.error(error); adminToast("Could not load listing submissions — check your connection"); return []; }
+  return data;
+}
+async function adminDeleteProperty(id){
+  const { error } = await chambersDB.from("properties").delete().eq("id", id);
+  if(error){ console.error(error); adminToast("Delete failed — check your connection"); return false; }
+  return true;
+}
+async function adminToggleFeatured(id){
+  const { data, error: readErr } = await chambersDB.from("properties").select("featured").eq("id", id).single();
+  if(readErr){ console.error(readErr); adminToast("Could not update — check your connection"); return; }
+  const { error } = await chambersDB.from("properties").update({ featured: !data.featured }).eq("id", id);
+  if(error){ console.error(error); adminToast("Could not update — check your connection"); }
+}
+async function adminUpsertProperty(prop){
+  const { error } = await chambersDB.from("properties").upsert(propertyToRow(prop));
+  if(error){ console.error(error); adminToast("Save failed — check your connection"); return false; }
+  return true;
+}
+
+/* ---------- Image upload (Supabase Storage) ---------- */
+async function uploadPropertyImage(file){
+  const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "-");
+  const path = `${Date.now()}-${cleanName}`;
+  const { error } = await chambersDB.storage.from("property-images").upload(path, file);
+  if(error){ console.error(error); adminToast("Image upload failed — check your connection"); return null; }
+  const { data } = chambersDB.storage.from("property-images").getPublicUrl(path);
+  return data.publicUrl;
+}
+
+/* ---------- Router ---------- */
+const ADMIN_VIEWS = ["dashboard","properties","add-property","developments","add-development","enquiries","listings","settings"];
+
+async function adminRoute(){
+  const hash = (location.hash || "#dashboard").replace("#","");
+  const view = ADMIN_VIEWS.includes(hash.split("/")[0]) ? hash.split("/")[0] : "dashboard";
+  document.querySelectorAll(".admin-nav a").forEach(a => a.classList.toggle("active", a.dataset.view === view));
+  document.querySelectorAll(".admin-view").forEach(v => v.style.display = v.id === "view-" + view ? "block" : "none");
+
+  if(view === "dashboard") await renderAdminDashboard();
+  if(view === "properties") await renderAdminProperties();
+  if(view === "add-property") await renderAdminPropertyForm(hash.split("/")[1] || null);
+  if(view === "developments") await renderAdminDevelopments();
+  if(view === "add-development") await renderAdminDevelopmentForm(hash.split("/")[1] || null);
+  if(view === "enquiries") await renderAdminEnquiries();
+  if(view === "listings") await renderAdminListings();
+  if(view === "settings") await renderAdminSettingsForm();
+}
+window.addEventListener("hashchange", adminRoute);
+
+/* ---------- Dashboard overview ---------- */
+async function renderAdminDashboard(){
+  const props = await adminGetProperties();
+  const enquiries = await adminGetEnquiries();
+  const listings = await adminGetListings();
+  const total = props.length;
+  const available = props.filter(p => (p.status || p.availability) === "Available").length;
+  const soldRented = props.filter(p => ["Sold","Rented"].includes(p.status || p.availability)).length;
+  const featured = props.filter(p => p.featured).length;
+  const newEnq = enquiries.filter(e => e.status === "New").length;
+  const newListings = listings.filter(l => l.status === "New").length;
+
+  document.getElementById("stat-total").textContent = total;
+  document.getElementById("stat-available").textContent = available;
+  document.getElementById("stat-soldrented").textContent = soldRented;
+  document.getElementById("stat-featured").textContent = featured;
+  document.getElementById("stat-enquiries").textContent = newEnq;
+  document.getElementById("stat-listings").textContent = newListings;
+
+  const recent = props.slice(0,5);
+  document.getElementById("dash-recent").innerHTML = recent.length
+    ? recent.map(p => adminTableRow(p)).join("")
+    : `<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--charcoal-60)">No properties yet.</td></tr>`;
+}
+
+/* ---------- Properties table ---------- */
+async function renderAdminProperties(){
+  const props = await adminGetProperties();
+  const tbody = document.getElementById("admin-property-rows");
+  if(!props.length){
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--charcoal-60)">No properties yet. Click "Add property" to create one.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = props.map(p => adminTableRow(p)).join("");
+}
+
+function adminTableRow(p){
+  const status = p.status || p.availability || "Available";
+  const statusClass = status.toLowerCase();
+  return `
+  <tr>
+    <td><img class="t-thumb" src="${p.image}" alt="${p.name}"></td>
+    <td><span class="t-name">${p.name}</span><br><span class="muted" style="font-size:.8rem">${p.type}</span></td>
+    <td>${p.location}</td>
+    <td>${p.price}</td>
+    <td><span class="status-pill ${statusClass}">${status}</span></td>
+    <td><button class="star-btn ${p.featured ? "on" : ""}" onclick="handleToggleFeatured('${p.id}')" title="Toggle featured">★</button></td>
+    <td>
+      <div class="t-actions">
+        <a class="icon-btn" href="#add-property/${p.id}" title="Edit">${editIcon()}</a>
+        <a class="icon-btn" href="../property.html?id=${p.id}" target="_blank" title="Preview">${eyeIcon()}</a>
+        <button class="icon-btn danger" onclick="handleDeleteProperty('${p.id}', '${p.name.replace(/'/g,"")}')" title="Delete">${trashIcon()}</button>
+      </div>
+    </td>
+  </tr>`;
+}
+async function handleToggleFeatured(id){
+  await adminToggleFeatured(id);
+  await renderAdminProperties();
+  await renderAdminDashboard();
+}
+async function handleDeleteProperty(id, name){
+  if(!confirm(`Delete ${name}? This cannot be undone.`)) return;
+  await adminDeleteProperty(id);
+  await renderAdminProperties();
+  await renderAdminDashboard();
+}
+
+/* ---------- Add / edit property form ---------- */
+async function renderAdminPropertyForm(id){
+  const editing = id ? (await adminGetProperties()).find(p => p.id === id) : null;
+  document.getElementById("form-heading").textContent = editing ? "Edit property" : "Add property";
+  document.getElementById("form-sub").textContent = editing ? `Editing "${editing.name}"` : "Create a new property listing.";
+
+  const f = document.getElementById("property-form");
+  f.dataset.editingId = editing ? editing.id : "";
+  f.name.value = editing?.name || "";
+  f.location.value = editing?.location || "";
+  f.price.value = editing?.price || "";
+  f.priceSub.value = editing?.priceSub || "";
+  f.type.value = editing?.type || "Apartment";
+  f.purpose.value = editing?.purpose || "For Sale";
+  f.bedrooms.value = editing?.bedrooms || "";
+  f.bathrooms.value = editing?.bathrooms || "";
+  f.toilets.value = editing?.toilets || "";
+  f.parking.value = editing?.parking || "";
+  f.size.value = editing?.size || "";
+  f.condition.value = editing?.condition || "";
+  f.titleDoc.value = editing?.titleDoc || "";
+  f.status.value = editing?.status || editing?.availability || "Available";
+  f.negotiable.checked = !!editing?.negotiable;
+  f.description.value = editing?.description || "";
+  f.features.value = editing?.features ? editing.features.join(", ") : "";
+  f.featured.checked = !!editing?.featured;
+
+  renderImagePreview(editing?.gallery || (editing?.image ? [editing.image] : []));
+}
+
+function renderImagePreview(urls){
+  const box = document.getElementById("img-preview");
+  box.innerHTML = urls.map((u,i) => `
+    <div class="rm"><img src="${u}" alt="preview"><button type="button" onclick="removePreviewImage(${i})">×</button></div>
+  `).join("");
+  box.dataset.urls = JSON.stringify(urls);
+}
+function removePreviewImage(i){
+  const urls = JSON.parse(document.getElementById("img-preview").dataset.urls || "[]");
+  urls.splice(i,1);
+  renderImagePreview(urls);
+}
+function addPreviewImageFromInput(){
+  const input = document.getElementById("img-url-input");
+  const val = input.value.trim();
+  if(!val) return;
+  const urls = JSON.parse(document.getElementById("img-preview").dataset.urls || "[]");
+  urls.push(val);
+  renderImagePreview(urls);
+  input.value = "";
+}
+async function handleImageFileSelect(inputEl){
+  const files = Array.from(inputEl.files || []);
+  if(!files.length) return;
+  const submitBtn = document.querySelector("#property-form button[type=submit]");
+  if(submitBtn) submitBtn.disabled = true;
+  adminToast(`Uploading ${files.length} photo${files.length>1?"s":""}…`);
+  const urls = JSON.parse(document.getElementById("img-preview").dataset.urls || "[]");
+  for(const file of files){
+    const url = await uploadPropertyImage(file);
+    if(url) urls.push(url);
+  }
+  renderImagePreview(urls);
+  inputEl.value = "";
+  if(submitBtn) submitBtn.disabled = false;
+  adminToast("Photos uploaded");
+}
+
+async function submitPropertyForm(e){
+  e.preventDefault();
+  const f = e.target;
+  const editingId = f.dataset.editingId;
+  const gallery = JSON.parse(document.getElementById("img-preview").dataset.urls || "[]");
+  const prop = {
+    id: editingId || "p" + Date.now(),
+    name: f.name.value,
+    location: f.location.value,
+    price: f.price.value,
+    priceSub: f.priceSub.value,
+    type: f.type.value,
+    purpose: f.purpose.value,
+    bedrooms: f.bedrooms.value ? Number(f.bedrooms.value) : null,
+    bathrooms: f.bathrooms.value ? Number(f.bathrooms.value) : null,
+    toilets: f.toilets.value ? Number(f.toilets.value) : null,
+    parking: f.parking.value ? Number(f.parking.value) : null,
+    size: f.size.value,
+    condition: f.condition.value,
+    titleDoc: f.titleDoc.value,
+    availability: f.status.value,
+    status: f.status.value,
+    negotiable: f.negotiable.checked,
+    featured: f.featured.checked,
+    image: gallery[0] || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop",
+    gallery: gallery.length ? gallery : ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop"],
+    description: f.description.value,
+    features: f.features.value.split(",").map(s => s.trim()).filter(Boolean),
+  };
+  const ok = await adminUpsertProperty(prop);
+  if(!ok) return;
+  location.hash = "#properties";
+  adminToast(editingId ? "Property updated" : "Property added");
+}
+
+/* ---------- Developments ---------- */
+async function renderAdminDevelopments(){
+  const devs = await adminGetDevelopments();
+  const tbody = document.getElementById("admin-dev-rows");
+  if(!devs.length){
+    tbody.innerHTML = `<tr><td colspan="5" style="padding:40px;text-align:center;color:var(--charcoal-60)">No developments yet. Click "Add development" to create one.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = devs.map(d => `
+    <tr>
+      <td><img class="t-thumb" src="${d.image}" alt="${d.name}"></td>
+      <td><span class="t-name">${d.name}</span></td>
+      <td>${d.location}</td>
+      <td><span class="status-pill available">${d.status}</span></td>
+      <td>
+        <div class="t-actions">
+          <a class="icon-btn" href="#add-development/${d.id}" title="Edit">${editIcon()}</a>
+          <a class="icon-btn" href="../development.html?id=${d.id}" target="_blank" title="Preview">${eyeIcon()}</a>
+          <button class="icon-btn danger" onclick="handleDeleteDevelopment('${d.id}', '${d.name.replace(/'/g,"")}')" title="Delete">${trashIcon()}</button>
+        </div>
+      </td>
+    </tr>`).join("");
+}
+async function handleDeleteDevelopment(id, name){
+  if(!confirm(`Delete ${name}? This cannot be undone.`)) return;
+  await adminDeleteDevelopment(id);
+  await renderAdminDevelopments();
+}
+
+/* ---------- Add / edit development form ---------- */
+async function renderAdminDevelopmentForm(id){
+  const editing = id ? (await adminGetDevelopments()).find(d => d.id === id) : null;
+  document.getElementById("dform-heading").textContent = editing ? "Edit development" : "Add development";
+  document.getElementById("dform-sub").textContent = editing ? `Editing "${editing.name}"` : "Create a new development project.";
+
+  const f = document.getElementById("development-form");
+  f.dataset.editingId = editing ? editing.id : "";
+  f.name.value = editing?.name || "";
+  f.location.value = editing?.location || "";
+  f.status.value = editing?.status || "Selling Off-Plan";
+  f.summary.value = editing?.summary || "";
+  f.description.value = editing?.description || "";
+  f.features.value = editing?.features ? editing.features.join(", ") : "";
+
+  renderDevImagePreview(editing?.gallery || (editing?.image ? [editing.image] : []));
+}
+
+function renderDevImagePreview(urls){
+  const box = document.getElementById("dimg-preview");
+  box.innerHTML = urls.map((u,i) => `
+    <div class="rm"><img src="${u}" alt="preview"><button type="button" onclick="removeDevPreviewImage(${i})">×</button></div>
+  `).join("");
+  box.dataset.urls = JSON.stringify(urls);
+}
+function removeDevPreviewImage(i){
+  const urls = JSON.parse(document.getElementById("dimg-preview").dataset.urls || "[]");
+  urls.splice(i,1);
+  renderDevImagePreview(urls);
+}
+function addDevPreviewImageFromInput(){
+  const input = document.getElementById("dimg-url-input");
+  const val = input.value.trim();
+  if(!val) return;
+  const urls = JSON.parse(document.getElementById("dimg-preview").dataset.urls || "[]");
+  urls.push(val);
+  renderDevImagePreview(urls);
+  input.value = "";
+}
+async function handleDevImageFileSelect(inputEl){
+  const files = Array.from(inputEl.files || []);
+  if(!files.length) return;
+  const submitBtn = document.querySelector("#development-form button[type=submit]");
+  if(submitBtn) submitBtn.disabled = true;
+  adminToast(`Uploading ${files.length} photo${files.length>1?"s":""}…`);
+  const urls = JSON.parse(document.getElementById("dimg-preview").dataset.urls || "[]");
+  for(const file of files){
+    const url = await uploadPropertyImage(file);
+    if(url) urls.push(url);
+  }
+  renderDevImagePreview(urls);
+  inputEl.value = "";
+  if(submitBtn) submitBtn.disabled = false;
+  adminToast("Photos uploaded");
+}
+
+async function submitDevelopmentForm(e){
+  e.preventDefault();
+  const f = e.target;
+  const editingId = f.dataset.editingId;
+  const gallery = JSON.parse(document.getElementById("dimg-preview").dataset.urls || "[]");
+  const dev = {
+    id: editingId || "d" + Date.now(),
+    name: f.name.value,
+    location: f.location.value,
+    status: f.status.value,
+    image: gallery[0] || "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop",
+    gallery: gallery.length ? gallery : ["https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1600&auto=format&fit=crop"],
+    summary: f.summary.value,
+    description: f.description.value,
+    features: f.features.value.split(",").map(s => s.trim()).filter(Boolean),
+  };
+  const ok = await adminUpsertDevelopment(dev);
+  if(!ok) return;
+  location.hash = "#developments";
+  adminToast(editingId ? "Development updated" : "Development added");
+}
+
+/* ---------- Enquiries ---------- */
+async function renderAdminEnquiries(){
+  const list = await adminGetEnquiries();
+  const tbody = document.getElementById("admin-enquiry-rows");
+  if(!list.length){
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--charcoal-60)">No enquiries yet.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(e => `
+    <tr>
+      <td><span class="t-name">${e.name}</span><br><span class="muted" style="font-size:.8rem">${e.phone}</span>${e.email ? `<br><span class="muted" style="font-size:.8rem">${e.email}</span>` : ""}</td>
+      <td>${e.property || "—"}</td>
+      <td>${e.purpose || "—"}</td>
+      <td style="max-width:280px">${e.message}</td>
+      <td>${e.date}</td>
+      <td><span class="status-pill ${e.status === "New" ? "available" : "sold"}">${e.status}</span></td>
+      <td><div class="t-actions"><button class="icon-btn danger" onclick="handleDeleteEnquiry('${e.id}', '${(e.name || "").replace(/'/g,"")}')" title="Delete">${trashIcon()}</button></div></td>
+    </tr>`).join("");
+}
+async function handleDeleteEnquiry(id, name){
+  if(!confirm(`Delete the enquiry from ${name}? This cannot be undone.`)) return;
+  await adminDeleteEnquiry(id);
+  await renderAdminEnquiries();
+}
+
+/* ---------- Listing submissions ---------- */
+async function renderAdminListings(){
+  const list = await adminGetListings();
+  const tbody = document.getElementById("admin-listing-rows");
+  if(!list.length){
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--charcoal-60)">No listing submissions yet.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map((l,i) => `
+    <tr onclick="toggleListingDetail(${i})" style="cursor:pointer">
+      <td><span class="t-name">${l.owner_name}</span><br><span class="muted" style="font-size:.8rem">${l.owner_phone}</span></td>
+      <td style="max-width:220px">${l.address}</td>
+      <td>${l.purpose || "—"}</td>
+      <td>${l.package || "—"}</td>
+      <td>${new Date(l.created_at).toLocaleDateString()}</td>
+      <td><span class="status-pill ${l.status === "New" ? "available" : "sold"}">${l.status}</span></td>
+      <td><div class="t-actions"><button class="icon-btn danger" onclick="event.stopPropagation(); handleDeleteListing('${l.id}', '${(l.owner_name || "").replace(/'/g,"")}')" title="Delete">${trashIcon()}</button></div></td>
+    </tr>
+    <tr id="listing-detail-${i}" style="display:none"><td colspan="7" style="background:var(--paper-2); padding:22px">${listingDetailHTML(l)}</td></tr>`).join("");
+}
+async function handleDeleteListing(id, name){
+  if(!confirm(`Delete the listing submission from ${name}? This cannot be undone.`)) return;
+  await adminDeleteListing(id);
+  await renderAdminListings();
+}
+function toggleListingDetail(i){
+  const row = document.getElementById("listing-detail-" + i);
+  row.style.display = row.style.display === "none" ? "table-row" : "none";
+}
+function listingDetailHTML(l){
+  const rows = [
+    ["Email", l.owner_email], ["Relationship to owner", l.relationship], ["Owner's consent", l.consent],
+    ["Description", l.description], ["Title document", l.title_document], ["Water source", l.water_source],
+    ["Asking price", l.asking_price], ["Selling price", l.selling_price], ["Rent price", l.rent_price],
+    ["Conditions", l.conditions], ["Wants our banner", l.wants_banner], ["Takes deposits", l.takes_deposits],
+    ["Custodian contact", l.custodian_contact], ["Agrees to terms", l.agrees_to_terms], ["Reason if disagreed", l.disagree_reason],
+  ].filter(([,v]) => v);
+  return `<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; font-size:.86rem;">${rows.map(([k,v]) => `<div><b>${k}:</b><br>${v}</div>`).join("")}</div>`;
+}
+
+/* ---------- Settings form ---------- */
+async function renderAdminSettingsForm(){
+  const s = await adminGetSettings();
+  const f = document.getElementById("settings-form");
+  f.phone.value = s?.phone_display || "";
+  f.whatsapp.value = s?.whatsapp_number || "";
+  f.email.value = s?.email || "";
+  f.hours.value = s?.hours_note || "";
+  f.address.value = s?.office_address || "";
+  f.instagram.value = s?.instagram_handle || "";
+  f.x.value = s?.x_handle || "";
+  f.facebook.value = s?.facebook_name || "";
+}
+async function submitSettingsForm(e){
+  e.preventDefault();
+  const f = e.target;
+  const ok = await adminSaveSettings({
+    phone_display: f.phone.value,
+    whatsapp_number: f.whatsapp.value.replace(/[^\d]/g, ""),
+    email: f.email.value,
+    hours_note: f.hours.value,
+    office_address: f.address.value,
+    instagram_handle: f.instagram.value,
+    x_handle: f.x.value,
+    facebook_name: f.facebook.value,
+  });
+  if(ok) adminToast("Settings saved");
+}
+
+/* ---------- Change password ---------- */
+async function submitPasswordForm(e){
+  e.preventDefault();
+  const f = e.target;
+  const errEl = document.getElementById("pw-error");
+  errEl.style.display = "none";
+  const newPw = document.getElementById("pw-new").value;
+  const confirmPw = document.getElementById("pw-confirm").value;
+
+  if(newPw !== confirmPw){
+    errEl.textContent = "Those two passwords don't match.";
+    errEl.style.display = "block";
+    return;
+  }
+
+  const { error } = await chambersDB.auth.updateUser({ password: newPw });
+  if(error){
+    errEl.textContent = "Couldn't update password — " + error.message;
+    errEl.style.display = "block";
+    return;
+  }
+  f.reset();
+  adminToast("Password updated");
+}
+
+/* ---------- Icons ---------- */
+function editIcon(){ return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>`; }
+function eyeIcon(){ return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`; }
+function trashIcon(){ return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>`; }
+
+/* ---------- Toast ---------- */
+function adminToast(msg){
+  let t = document.getElementById("admin-toast");
+  if(!t){
+    t = document.createElement("div");
+    t.id = "admin-toast";
+    t.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:12px 22px;border-radius:6px;font-size:.88rem;z-index:999;opacity:0;transition:opacity .3s;";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = "1";
+  setTimeout(() => t.style.opacity = "0", 2200);
+}
+
+document.addEventListener("DOMContentLoaded", adminRoute);

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin | Chambers Real Estate</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="icon" type="image/png" href="../img/logo-symbol-dark.png">
+</head>
+<body class="admin-body">
+
+<div class="admin-shell" id="admin-shell" style="display:none">
+  <aside class="admin-sidebar">
+    <div class="admin-brand"><a href="../index.html"><img src="../img/logo-full-white.png" alt="Chambers Real Estate" class="brand-logo-img brand-logo-img-admin"></a></div>
+    <nav class="admin-nav">
+      <a href="#dashboard" data-view="dashboard">Dashboard</a>
+      <a href="#properties" data-view="properties">Properties</a>
+      <a href="#add-property" data-view="add-property">Add property</a>
+      <a href="#developments" data-view="developments">Developments</a>
+      <a href="#add-development" data-view="add-development">Add development</a>
+      <a href="#enquiries" data-view="enquiries">Enquiries</a>
+      <a href="#listings" data-view="listings">Listing Submissions</a>
+      <a href="#settings" data-view="settings">Settings</a>
+      <a href="#" id="logout-link" onclick="handleLogout(event)">Log out</a>
+      <div class="divider"></div>
+      <a href="../index.html">Back to website</a>
+    </nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="badge-note">Internal management dashboard for Chambers Real Estate staff. Not accessible from the public website.</div>
+
+    <!-- DASHBOARD -->
+    <section class="admin-view" id="view-dashboard">
+      <div class="admin-topbar">
+        <div><h1>Dashboard</h1><p>An overview of Chambers' current listings and enquiries.</p></div>
+        <a href="#add-property" class="btn btn-primary btn-sm">+ Add property</a>
+      </div>
+      <div class="stat-cards">
+        <div class="stat-card"><b id="stat-total">0</b><span>Total properties</span></div>
+        <div class="stat-card"><b id="stat-available">0</b><span>Available</span></div>
+        <div class="stat-card"><b id="stat-soldrented">0</b><span>Sold / Rented</span></div>
+        <div class="stat-card"><b id="stat-featured">0</b><span>Featured</span></div>
+        <div class="stat-card"><b id="stat-enquiries">0</b><span>New enquiries</span></div>
+        <div class="stat-card"><b id="stat-listings">0</b><span>New listing submissions</span></div>
+      </div>
+      <div class="admin-panel">
+        <div class="admin-panel-head"><h3>Recently added</h3><a href="#properties" class="btn btn-ghost btn-sm">View all</a></div>
+        <table class="admin-table">
+          <thead><tr><th>Image</th><th>Property</th><th>Location</th><th>Price</th><th>Status</th><th>Featured</th><th>Actions</th></tr></thead>
+          <tbody id="dash-recent"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PROPERTIES -->
+    <section class="admin-view" id="view-properties" style="display:none">
+      <div class="admin-topbar">
+        <div><h1>Properties</h1><p>Manage every listing shown on the website.</p></div>
+        <a href="#add-property" class="btn btn-primary btn-sm">+ Add property</a>
+      </div>
+      <div class="admin-panel">
+        <table class="admin-table">
+          <thead><tr><th>Image</th><th>Property</th><th>Location</th><th>Price</th><th>Status</th><th>Featured</th><th>Actions</th></tr></thead>
+          <tbody id="admin-property-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ADD / EDIT PROPERTY -->
+    <section class="admin-view" id="view-add-property" style="display:none">
+      <div class="admin-topbar">
+        <div><h1 id="form-heading">Add property</h1><p id="form-sub">Create a new property listing.</p></div>
+      </div>
+      <div class="admin-panel">
+        <form class="admin-form" id="property-form" onsubmit="submitPropertyForm(event)">
+          <div class="full">
+            <label>Images</label>
+            <div class="upload-box">
+              <input type="file" id="img-file-input" accept="image/*" multiple onchange="handleImageFileSelect(this)" style="margin-bottom:10px">
+              <div>Choose photos from your phone or PC, or paste an image link below.</div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:12px">
+              <input type="text" id="img-url-input" placeholder="https://images.example.com/photo.jpg">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="addPreviewImageFromInput()">Add image</button>
+            </div>
+            <div class="img-preview-row" id="img-preview" data-urls="[]"></div>
+          </div>
+
+          <div><label for="pf-name">Property title</label><input id="pf-name" name="name" required placeholder="e.g. The Nassarawa Residence"></div>
+          <div><label for="pf-location">Location</label><input id="pf-location" name="location" required placeholder="e.g. Nassarawa GRA, Kano"></div>
+
+          <div><label for="pf-price">Price</label><input id="pf-price" name="price" required placeholder="e.g. ₦85,000,000"></div>
+          <div><label for="pf-priceSub">Price note</label><input id="pf-priceSub" name="priceSub" placeholder="e.g. Per annum / Outright sale"></div>
+
+          <div><label for="pf-type">Property type</label>
+            <select id="pf-type" name="type">
+              <option>Apartment</option><option>House</option><option>Land</option><option>Commercial</option>
+            </select>
+          </div>
+          <div><label for="pf-purpose">Purpose</label>
+            <select id="pf-purpose" name="purpose">
+              <option>For Sale</option><option>For Rent</option><option>Investment</option>
+            </select>
+          </div>
+
+          <div><label for="pf-bed">Bedrooms</label><input id="pf-bed" name="bedrooms" type="number" min="0" placeholder="e.g. 4"></div>
+          <div><label for="pf-bath">Bathrooms</label><input id="pf-bath" name="bathrooms" type="number" min="0" placeholder="e.g. 4"></div>
+          <div><label for="pf-toilets">Toilets</label><input id="pf-toilets" name="toilets" type="number" min="0" placeholder="e.g. 5"></div>
+          <div><label for="pf-parking">Parking spaces</label><input id="pf-parking" name="parking" type="number" min="0" placeholder="e.g. 3"></div>
+
+          <div><label for="pf-size">Size</label><input id="pf-size" name="size" placeholder="e.g. 450 sqm"></div>
+          <div><label for="pf-condition">Condition</label><input id="pf-condition" name="condition" placeholder="e.g. Newly built"></div>
+          <div><label for="pf-titledoc">Title document</label><input id="pf-titledoc" name="titleDoc" placeholder="e.g. Certificate of Occupancy"></div>
+          <div><label for="pf-status">Status</label>
+            <select id="pf-status" name="status">
+              <option>Available</option><option>Sold</option><option>Rented</option>
+            </select>
+          </div>
+
+          <div class="full"><label for="pf-desc">Description</label><textarea id="pf-desc" name="description" rows="4" required placeholder="Property description"></textarea></div>
+          <div class="full"><label for="pf-features">Features (comma separated)</label><input id="pf-features" name="features" placeholder="Fitted kitchen, Borehole, 24hr security"></div>
+
+          <div class="full" style="display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" id="pf-negotiable" name="negotiable" style="width:auto">
+            <label for="pf-negotiable" style="margin:0">Price is negotiable</label>
+          </div>
+
+          <div class="full" style="display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" id="pf-featured" name="featured" style="width:auto">
+            <label for="pf-featured" style="margin:0">Feature this property on the homepage</label>
+          </div>
+
+          <div class="admin-form-actions">
+            <a href="#properties" class="btn btn-ghost btn-sm">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-sm">Save property</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- DEVELOPMENTS -->
+    <section class="admin-view" id="view-developments" style="display:none">
+      <div class="admin-topbar">
+        <div><h1>Developments</h1><p>Chambers' development projects.</p></div>
+        <a href="#add-development" class="btn btn-primary btn-sm">+ Add development</a>
+      </div>
+      <div class="admin-panel">
+        <table class="admin-table">
+          <thead><tr><th>Image</th><th>Project</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="admin-dev-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ADD / EDIT DEVELOPMENT -->
+    <section class="admin-view" id="view-add-development" style="display:none">
+      <div class="admin-topbar">
+        <div><h1 id="dform-heading">Add development</h1><p id="dform-sub">Create a new development project.</p></div>
+      </div>
+      <div class="admin-panel">
+        <form class="admin-form" id="development-form" onsubmit="submitDevelopmentForm(event)">
+          <div class="full">
+            <label>Images</label>
+            <div class="upload-box">
+              <input type="file" id="dimg-file-input" accept="image/*" multiple onchange="handleDevImageFileSelect(this)" style="margin-bottom:10px">
+              <div>Choose photos from your phone or PC, or paste an image link below.</div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:12px">
+              <input type="text" id="dimg-url-input" placeholder="https://images.example.com/photo.jpg">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="addDevPreviewImageFromInput()">Add image</button>
+            </div>
+            <div class="img-preview-row" id="dimg-preview" data-urls="[]"></div>
+          </div>
+
+          <div class="full"><label for="df-name">Project name</label><input id="df-name" name="name" required placeholder="e.g. Polo Residences by Chambers"></div>
+          <div><label for="df-location">Location</label><input id="df-location" name="location" required placeholder="e.g. Nasarawa GRA, Kano"></div>
+          <div><label for="df-status">Status</label>
+            <select id="df-status" name="status">
+              <option>Selling Off-Plan</option><option>Under Finishing</option><option>Ongoing</option><option>Planning</option><option>Completed</option>
+            </select>
+          </div>
+
+          <div class="full"><label for="df-summary">Short summary</label><input id="df-summary" name="summary" required placeholder="One line shown on the development card"></div>
+          <div class="full"><label for="df-desc">Full description</label><textarea id="df-desc" name="description" rows="4" required placeholder="Development description"></textarea></div>
+          <div class="full"><label for="df-features">Features (comma separated)</label><input id="df-features" name="features" placeholder="Gated estate, Smart home technology, Green spaces"></div>
+
+          <div class="admin-form-actions">
+            <a href="#developments" class="btn btn-ghost btn-sm">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-sm">Save development</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ENQUIRIES -->
+    <section class="admin-view" id="view-enquiries" style="display:none">
+      <div class="admin-topbar">
+        <div><h1>Enquiries</h1><p>Messages submitted through the website's contact form.</p></div>
+      </div>
+      <div class="admin-panel">
+        <table class="admin-table">
+          <thead><tr><th>Contact</th><th>Property</th><th>Looking to</th><th>Message</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="admin-enquiry-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- LISTING SUBMISSIONS -->
+    <section class="admin-view" id="view-listings" style="display:none">
+      <div class="admin-topbar">
+        <div><h1>Listing Submissions</h1><p>Property owners who submitted the "List Your Property" form.</p></div>
+      </div>
+      <div class="admin-panel">
+        <table class="admin-table">
+          <thead><tr><th>Owner</th><th>Property</th><th>Purpose</th><th>Package</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="admin-listing-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="admin-view" id="view-settings" style="display:none">
+      <div class="admin-topbar"><div><h1>Settings</h1><p>Business information used across the website.</p></div></div>
+      <div class="admin-panel" style="padding:26px">
+        <div class="badge-note" style="margin-bottom:16px; max-width:none;">These values show on every page's footer, the contact page, and WhatsApp links. Changes apply across the whole website once saved.</div>
+        <form class="admin-form" id="settings-form" style="padding:0" onsubmit="submitSettingsForm(event)">
+          <div><label for="sf-phone">Phone</label><input id="sf-phone" name="phone" placeholder="e.g. +234 803 951 8503"></div>
+          <div><label for="sf-whatsapp">WhatsApp number</label><input id="sf-whatsapp" name="whatsapp" placeholder="e.g. 2348039518503"></div>
+          <div><label for="sf-email">Email</label><input id="sf-email" name="email" type="email" placeholder="e.g. info@chambers.ng"></div>
+          <div><label for="sf-hours">Business hours</label><input id="sf-hours" name="hours" placeholder="e.g. Monday – Saturday, 9:00 AM – 6:00 PM"></div>
+          <div class="full"><label for="sf-address">Office address</label><input id="sf-address" name="address" placeholder="e.g. Lamido Crescent, Nassarawa, Kano State"></div>
+          <div><label for="sf-instagram">Instagram</label><input id="sf-instagram" name="instagram" placeholder="e.g. @chambers.ng"></div>
+          <div><label for="sf-x">X (Twitter)</label><input id="sf-x" name="x" placeholder="e.g. @chambers.ng"></div>
+          <div class="full"><label for="sf-facebook">Facebook page name</label><input id="sf-facebook" name="facebook" placeholder="e.g. Kano Properties by Chambers"></div>
+          <div class="admin-form-actions">
+            <button type="submit" class="btn btn-primary btn-sm">Save settings</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="admin-topbar" style="margin-top:34px"><div><h1>Your login</h1><p>Change the password for the account you're logged in with.</p></div></div>
+      <div class="admin-panel" style="padding:26px">
+        <form class="admin-form" id="password-form" style="padding:0" onsubmit="submitPasswordForm(event)">
+          <div><label for="pw-new">New password</label><input id="pw-new" type="password" required minlength="8" placeholder="At least 8 characters"></div>
+          <div><label for="pw-confirm">Confirm new password</label><input id="pw-confirm" type="password" required minlength="8" placeholder="Type it again"></div>
+          <div id="pw-error" class="full" style="display:none; color:#B3261E; font-size:.85rem"></div>
+          <div class="admin-form-actions">
+            <button type="submit" class="btn btn-primary btn-sm">Update password</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="auth-guard.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

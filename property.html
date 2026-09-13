@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="doc-title">Property | Chambers Real Estate</title>
+<meta id="doc-desc" name="description" content="Property details from Chambers Real Estate, Kano.">
+<meta property="og:title" content="Property Listing | Chambers Real Estate">
+<meta property="og:description" content="View this property listing with Chambers Real Estate, Kano.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="img/pdf-house-1.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/site.css">
+<link rel="icon" type="image/png" href="img/logo-symbol-dark.png">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="brand"><img src="img/logo-full-ink.png" alt="Chambers Real Estate" class="brand-logo-img"></a>
+    <div class="nav-links">
+      <a href="index.html" data-nav="index.html">Home</a>
+      <a href="properties.html" data-nav="properties.html" class="active">Properties</a>
+      <a href="developments.html" data-nav="developments.html">Developments</a>
+      <a href="services.html" data-nav="services.html">Services</a>
+      <a href="list-property.html" data-nav="list-property.html">List Property</a>
+      <a href="about.html" data-nav="about.html">About</a>
+      <a href="contact.html" data-nav="contact.html">Contact</a>
+    </div>
+    <div class="nav-cta">
+      <a href="contact.html" class="btn btn-clay btn-sm">Enquire</a>
+      <button class="nav-burger" aria-label="Open menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="nav-scrim"></div>
+</nav>
+
+<div id="notfound" class="wrap" style="display:none; padding-block:96px" class="section">
+  <div class="empty-state">
+    <h2 style="margin-bottom:12px">Property not found</h2>
+    <p>This listing may have been removed. <a href="properties.html" style="color:var(--clay)">Browse all properties →</a></p>
+  </div>
+</div>
+
+<main id="content" style="display:none">
+  <div class="section" style="padding-bottom:0; padding-top:32px">
+    <div class="wrap">
+      <div class="breadcrumb" style="color:var(--charcoal-60); margin-bottom:20px">
+        <a href="index.html">Home</a> / <a href="properties.html">Properties</a> / <span id="crumb-name"></span>
+      </div>
+      <div class="gallery" id="gallery"></div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Property photos">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close photo viewer">&times;</button>
+    <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous photo">&larr;</button>
+    <img id="lightbox-img" src="" alt="Property photo">
+    <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next photo">&rarr;</button>
+    <div class="lightbox-count" id="lightbox-count"></div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="detail-layout">
+        <div>
+          <div class="detail-title-row">
+            <div>
+              <div class="p-loc" id="d-loc" style="margin-bottom:10px"></div>
+              <h1 id="d-name"></h1>
+            </div>
+            <div>
+              <div class="detail-price" id="d-price"></div>
+              <div class="muted" id="d-price-sub" style="text-align:right; font-size:.85rem"></div>
+              <div class="negotiable-tag" id="d-negotiable" style="display:none; text-align:right; margin-top:4px;">Negotiable</div>
+            </div>
+          </div>
+
+          <div class="spec-tiles" id="spec-tiles"></div>
+
+          <div class="block">
+            <h3>Description</h3>
+            <p id="d-desc"></p>
+          </div>
+
+          <div class="block">
+            <h3>Property specifications</h3>
+            <div class="specs-list" id="specs-list"></div>
+          </div>
+
+          <div class="block" id="features-block">
+            <h3>Features &amp; amenities</h3>
+            <ul class="feature-list" id="d-features"></ul>
+          </div>
+
+          <div class="block" style="border-bottom:0">
+            <h3>Location</h3>
+            <p style="margin-bottom:16px" id="d-loc2"></p>
+            <div class="map-box"><iframe id="d-map" loading="lazy" title="Property location"></iframe></div>
+          </div>
+        </div>
+
+        <aside class="enquiry-box">
+          <div class="price" id="e-price"></div>
+          <div class="price-sub" id="e-price-sub"></div>
+          <a href="#" id="e-wa" target="_blank" rel="noopener" class="btn btn-wa btn-block">Enquire on WhatsApp</a>
+          <a href="#" id="e-inspect" class="btn btn-primary btn-block">Schedule an inspection</a>
+          <a href="#" id="e-details" class="btn btn-ghost btn-block">Request property details</a>
+          <div class="enquiry-agent">
+            <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=200&auto=format&fit=crop" alt="Chambers Real Estate agent">
+            <div>
+              <b>Chambers Real Estate</b>
+              <span id="e-phone"></span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <section class="section" style="background:var(--paper-2)" id="similar-section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><span class="section-tag">You may also like</span><h2>Similar properties</h2></div>
+        <a href="properties.html" class="btn btn-ghost">View all properties</a>
+      </div>
+      <div class="grid-3" id="similar-grid"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><img src="img/logo-full-white.png" alt="Chambers Real Estate" class="brand-logo-img brand-logo-img-footer"></div>
+        <p>Your Ultimate Source of Excellence.<br>Kano, Nigeria.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="properties.html">Properties</a></li>
+          <li><a href="developments.html">Developments</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="list-property.html">List Property</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="https://instagram.com/chambers.ng" target="_blank" rel="noopener" class="social-link ic-ig"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg> Instagram</a></li>
+          <li><a href="https://x.com/chambers.ng" target="_blank" rel="noopener" class="social-link ic-x"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2.4h3.3l-7.2 8.2 8.5 11h-6.6l-5.2-6.8-5.9 6.8H2.4l7.7-8.8L1.9 2.4h6.8l4.7 6.2 5.5-6.2Zm-1.2 17.3h1.8L7.4 4.2H5.5l12.2 15.5Z"/></svg> X (Twitter)</a></li>
+          <li><a href="https://www.facebook.com/p/Kano-Properties-By-chambers-100070028132878/" target="_blank" rel="noopener" class="social-link ic-fb"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12S0 5.446 0 12.073c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073Z"/></svg> Facebook</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Get in touch</h4>
+        <ul>
+          <li><span id="f-phone"></span></li>
+          <li><a href="mailto:chambersrestate@gmail.com" id="f-email"></a></li>
+          <li><span id="f-addr"></span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Chambers Real Estate. All rights reserved.</span>
+      <span>Your Ultimate Source of Excellence</span>
+      <span>CAC Registered &middot; RC 1825810</span>
+    </div>
+  </div>
+</footer>
+
+<a class="wa-float" id="wa-float" target="_blank" rel="noopener" aria-label="Chat with Chambers on WhatsApp">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.4 2 11.9c0 1.9.5 3.6 1.5 5.2L2 22l5.1-1.4c1.5.8 3.2 1.2 4.9 1.2 5.5 0 10-4.4 10-9.9S17.5 2 12 2Zm0 18c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3A7.9 7.9 0 0 1 4 11.9C4 7.5 7.6 4 12 4s8 3.5 8 7.9-3.6 8.1-8 8.1Zm4.4-6.1c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.8 1-.1.1-.3.2-.5.1-.7-.3-1.4-.7-2-1.3-.5-.5-1-1.1-1.4-1.7-.1-.2 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4.1-.1.1-.3 0-.4-.1-.1-.5-1.2-.7-1.7-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.6.6-.9 1.3-.9 2.1.1.9.4 1.8 1 2.6 1 1.5 2.2 2.7 3.7 3.5.5.2.9.4 1.4.5.6.2 1.1.2 1.5.1.5-.1 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1-.1-.1-.2-.2-.4-.3Z"/></svg>
+</a>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/config.js"></script>
+<script src="js/site-settings-loader.js"></script>
+<script src="js/data.js"></script>
+<script src="js/data-loader.js"></script>
+<script src="js/main.js"></script>
+<script>
+(async () => {
+  await loadSiteSettings();
+  await loadChambersData();
+  const id = new URLSearchParams(location.search).get("id");
+  const p = getPropertyById(id);
+
+  if(!p){
+    document.getElementById("notfound").style.display = "block";
+  } else {
+    document.getElementById("content").style.display = "block";
+    document.getElementById("doc-title").textContent = `${p.name} | ${p.location} | Chambers Real Estate`;
+    document.getElementById("doc-desc").setAttribute("content", `${p.name}, a ${p.type.toLowerCase()} ${p.purpose.toLowerCase()} in ${p.location}. ${p.price}.`);
+    document.getElementById("crumb-name").textContent = p.name;
+    document.getElementById("d-name").textContent = p.name;
+    document.getElementById("d-loc").innerHTML = pinIcon() + " " + p.location;
+    document.getElementById("d-loc2").textContent = p.location + ", Kano, Nigeria.";
+    document.getElementById("d-price").textContent = p.price;
+    document.getElementById("d-price-sub").textContent = p.priceSub || "";
+    if(p.negotiable) document.getElementById("d-negotiable").style.display = "block";
+    document.getElementById("d-desc").textContent = p.description;
+    document.getElementById("e-price").textContent = p.price;
+    document.getElementById("e-price-sub").textContent = p.priceSub || "";
+    document.getElementById("e-phone").textContent = CHAMBERS_CONFIG.phoneDisplay;
+    document.getElementById("d-map").src = CHAMBERS_CONFIG.mapEmbedSrc;
+
+    const tiles = [];
+    if(p.bedrooms) tiles.push({icon: bedIcon(), text: `${p.bedrooms} ${p.bedrooms === 1 ? "Bedroom" : "Bedrooms"}`});
+    if(p.bathrooms) tiles.push({icon: bathIcon(), text: `${p.bathrooms} ${p.bathrooms === 1 ? "Bathroom" : "Bathrooms"}`});
+    if(p.toilets) tiles.push({icon: toiletIcon(), text: `${p.toilets} ${p.toilets === 1 ? "Toilet" : "Toilets"}`});
+    if(p.parking) tiles.push({icon: carIcon(), text: `${p.parking} ${p.parking === 1 ? "Parking space" : "Parking"}`});
+    tiles.push({icon: tagIcon(), text: p.type});
+    tiles.push({icon: checkIcon(), text: p.availability});
+    document.getElementById("spec-tiles").innerHTML = tiles.map(t => `
+      <div class="spec-tile">
+        <div class="spec-tile-icon">${t.icon}</div>
+        <div class="spec-tile-value">${t.text}</div>
+      </div>`).join("");
+
+    const sizeLabel = p.type === "Land" ? "Land size" : "Building size";
+    const sizeIconForSpec = p.type === "Land" ? flagIcon() : buildingIcon();
+    const specRows = [
+      { icon: sizeIconForSpec, label: sizeLabel, value: p.size },
+      { icon: null, label: "Condition", value: p.condition },
+      { icon: null, label: "Title", value: p.titleDoc },
+    ].filter(r => r.value);
+    document.getElementById("specs-list").innerHTML = specRows.map(r => `
+      <div class="specs-row">
+        <span class="specs-label">${r.icon ? `<span class="specs-row-icon">${r.icon}</span>` : ""}${r.label}</span>
+        <span class="specs-value">${r.value}</span>
+      </div>`).join("");
+
+    document.getElementById("d-features").innerHTML = p.features.map(f => `<li>${f}</li>`).join("");
+    document.getElementById("features-block").style.display = p.features.length ? "block" : "none";
+
+    const galleryEl = document.getElementById("gallery");
+    galleryEl.classList.toggle("gallery-single", p.gallery.length === 1);
+    galleryEl.classList.toggle("gallery-pair", p.gallery.length === 2);
+    galleryEl.innerHTML = `
+      <div class="g-main" onclick="openLightbox(0)"><img src="${p.gallery[0]}" alt="${p.name}, main view" loading="eager"></div>
+      ${p.gallery.length > 1 ? `<div class="g-side">
+        ${(p.gallery.slice(1,3)).map((src,i) => {
+          const idx = i+1;
+          const remaining = p.gallery.length - 3;
+          const showMore = (idx === 2 && remaining > 0);
+          return `<div onclick="openLightbox(${idx})">
+            <img src="${src}" alt="${p.name}, interior view" loading="lazy">
+            ${showMore ? `<div class="g-more">+${remaining} photo${remaining>1?"s":""}</div>` : ""}
+          </div>`;
+        }).join("")}
+      </div>` : ""}
+      <div class="gallery-count" onclick="openLightbox(0)">${galleryIcon()} ${p.gallery.length} photo${p.gallery.length>1?"s":""}</div>`;
+    initLightbox(p.gallery, p.name);
+
+    const waMsg = `Hello Chambers Real Estate, I'm interested in ${p.name}. I'd like to know more about it.`;
+    document.getElementById("e-wa").href = waLink(waMsg);
+    document.getElementById("e-inspect").href = waLink(`Hello Chambers Real Estate, I'd like to schedule an inspection for ${p.name}.`);
+    document.getElementById("e-details").href = "contact.html?property=" + encodeURIComponent(p.name);
+    document.getElementById("wa-float").href = waLink(waMsg);
+
+    const similar = PROPERTIES.filter(x => x.id !== p.id && (x.type === p.type || x.purpose === p.purpose)).slice(0,3);
+    const similarList = similar.length ? similar : PROPERTIES.filter(x => x.id !== p.id).slice(0,3);
+    document.getElementById("similar-section").style.display = similarList.length ? "block" : "none";
+    renderProperties("#similar-grid", similarList);
+  }
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+  document.getElementById("f-phone").textContent = CHAMBERS_CONFIG.phoneDisplay;
+  document.getElementById("f-email").textContent = CHAMBERS_CONFIG.email;
+  document.getElementById("f-addr").textContent = CHAMBERS_CONFIG.officeAddress;
+})();
+</script>
+</body>
+</html>

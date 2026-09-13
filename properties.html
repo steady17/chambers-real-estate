@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Properties | Chambers Real Estate, Kano</title>
+<meta name="description" content="Browse properties for sale, for rent, and for investment with Chambers Real Estate in Kano.">
+<meta property="og:title" content="Properties | Chambers Real Estate">
+<meta property="og:description" content="Browse properties for sale, for rent, and for investment with Chambers Real Estate in Kano.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="img/pdf-house-1.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/site.css">
+<link rel="icon" type="image/png" href="img/logo-symbol-dark.png">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="brand"><img src="img/logo-full-ink.png" alt="Chambers Real Estate" class="brand-logo-img"></a>
+    <div class="nav-links">
+      <a href="index.html" data-nav="index.html">Home</a>
+      <a href="properties.html" data-nav="properties.html" class="active">Properties</a>
+      <a href="developments.html" data-nav="developments.html">Developments</a>
+      <a href="services.html" data-nav="services.html">Services</a>
+      <a href="list-property.html" data-nav="list-property.html">List Property</a>
+      <a href="about.html" data-nav="about.html">About</a>
+      <a href="contact.html" data-nav="contact.html">Contact</a>
+    </div>
+    <div class="nav-cta">
+      <a href="contact.html" class="btn btn-clay btn-sm">Enquire</a>
+      <button class="nav-burger" aria-label="Open menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="nav-scrim"></div>
+</nav>
+
+<div class="page-head">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; Properties</div>
+    <span class="eyebrow">Properties</span>
+    <h1>Every property, in one place.</h1>
+    <p>Filter by location, type, purpose and price to find what fits. Every listing is reviewed by Chambers before it's published.</p>
+  </div>
+</div>
+
+<section class="section" style="padding-top:48px">
+  <div class="wrap">
+    <form class="filter-bar" onsubmit="applyPropertyFilters(); return false;">
+      <select id="f-location" onchange="applyPropertyFilters()">
+        <option value="">Any location</option>
+        <option>Nassarawa GRA, Kano</option>
+        <option>Zoo Road, Kano</option>
+        <option>Kwanar Dawaki, Kano</option>
+        <option>Airport Road, Kano</option>
+        <option>Gwarzo Road, Kano</option>
+        <option>Hotoro, Kano</option>
+      </select>
+      <select id="f-type" onchange="applyPropertyFilters()">
+        <option value="">Any type</option>
+        <option>Apartment</option>
+        <option>House</option>
+        <option>Land</option>
+        <option>Commercial</option>
+      </select>
+      <select id="f-purpose" onchange="applyPropertyFilters()">
+        <option value="">Any purpose</option>
+        <option>For Sale</option>
+        <option>For Rent</option>
+        <option>Investment</option>
+      </select>
+      <select id="f-price" onchange="applyPropertyFilters()">
+        <option value="">Any price</option>
+        <option value="low">Under ₦5,000,000</option>
+        <option value="mid">₦5,000,000 – ₦30,000,000</option>
+        <option value="high">Above ₦30,000,000</option>
+      </select>
+      <span class="filter-count" id="result-count"></span>
+    </form>
+
+    <div class="grid-3" id="property-grid"></div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--paper-2)">
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <div>
+        <h2>Can't find the right fit?</h2>
+        <p>Tell Chambers what you're looking for and we'll help you find a property that matches.</p>
+      </div>
+      <div class="hero-actions" style="margin-top:0">
+        <a href="contact.html" class="btn btn-clay">Talk to Chambers</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><img src="img/logo-full-white.png" alt="Chambers Real Estate" class="brand-logo-img brand-logo-img-footer"></div>
+        <p>Your Ultimate Source of Excellence.<br>Kano, Nigeria.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="properties.html">Properties</a></li>
+          <li><a href="developments.html">Developments</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="list-property.html">List Property</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="https://instagram.com/chambers.ng" target="_blank" rel="noopener" class="social-link ic-ig"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg> Instagram</a></li>
+          <li><a href="https://x.com/chambers.ng" target="_blank" rel="noopener" class="social-link ic-x"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2.4h3.3l-7.2 8.2 8.5 11h-6.6l-5.2-6.8-5.9 6.8H2.4l7.7-8.8L1.9 2.4h6.8l4.7 6.2 5.5-6.2Zm-1.2 17.3h1.8L7.4 4.2H5.5l12.2 15.5Z"/></svg> X (Twitter)</a></li>
+          <li><a href="https://www.facebook.com/p/Kano-Properties-By-chambers-100070028132878/" target="_blank" rel="noopener" class="social-link ic-fb"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12S0 5.446 0 12.073c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073Z"/></svg> Facebook</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Get in touch</h4>
+        <ul>
+          <li><span id="f-phone"></span></li>
+          <li><a href="mailto:chambersrestate@gmail.com" id="f-email"></a></li>
+          <li><span id="f-addr"></span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Chambers Real Estate. All rights reserved.</span>
+      <span>Your Ultimate Source of Excellence</span>
+      <span>CAC Registered &middot; RC 1825810</span>
+    </div>
+  </div>
+</footer>
+
+<a class="wa-float" id="wa-float" target="_blank" rel="noopener" aria-label="Chat with Chambers on WhatsApp">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.4 2 11.9c0 1.9.5 3.6 1.5 5.2L2 22l5.1-1.4c1.5.8 3.2 1.2 4.9 1.2 5.5 0 10-4.4 10-9.9S17.5 2 12 2Zm0 18c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3A7.9 7.9 0 0 1 4 11.9C4 7.5 7.6 4 12 4s8 3.5 8 7.9-3.6 8.1-8 8.1Zm4.4-6.1c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.8 1-.1.1-.3.2-.5.1-.7-.3-1.4-.7-2-1.3-.5-.5-1-1.1-1.4-1.7-.1-.2 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4.1-.1.1-.3 0-.4-.1-.1-.5-1.2-.7-1.7-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.6.6-.9 1.3-.9 2.1.1.9.4 1.8 1 2.6 1 1.5 2.2 2.7 3.7 3.5.5.2.9.4 1.4.5.6.2 1.1.2 1.5.1.5-.1 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1-.1-.1-.2-.2-.4-.3Z"/></svg>
+</a>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/config.js"></script>
+<script src="js/site-settings-loader.js"></script>
+<script src="js/data.js"></script>
+<script src="js/data-loader.js"></script>
+<script src="js/main.js"></script>
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+  (async () => {
+    await loadSiteSettings();
+    document.getElementById("f-phone").textContent = CHAMBERS_CONFIG.phoneDisplay;
+    document.getElementById("f-email").textContent = CHAMBERS_CONFIG.email;
+    document.getElementById("f-addr").textContent = CHAMBERS_CONFIG.officeAddress;
+  })();
+  document.getElementById("wa-float").href = waLink("Hello Chambers Real Estate, I'd like to speak with someone about a property.");
+  (async () => {
+    await loadChambersData();
+    hydrateFiltersFromQuery();
+    applyPropertyFilters();
+  })();
+</script>
+</body>
+</html>
