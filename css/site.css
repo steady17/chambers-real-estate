@@ -104,7 +104,7 @@
 @media (max-width:620px){ .grid-3,.grid-4{ grid-template-columns:1fr; } .dev-grid-2col{ grid-template-columns:1fr; } }
 
 .p-card{
-  background:var(--white); border:1px solid transparent; border-radius:var(--radius-l);
+  background:var(--white); border:1px solid var(--line); border-radius:var(--radius-l);
   overflow:hidden; box-shadow:var(--shadow-1);
   transition:box-shadow .35s var(--ease), transform .35s var(--ease);
   display:flex; flex-direction:column; height:100%;
@@ -132,7 +132,7 @@
 /* ---------- CATEGORY CARDS (browse by type) ---------- */
 .cat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
 .cat-card{
-  background:var(--white); border:1px solid transparent; border-radius:var(--radius-l);
+  background:var(--white); border:1px solid var(--line); border-radius:var(--radius-l);
   padding:32px 28px; display:flex; flex-direction:column; gap:18px; position:relative;
   box-shadow:var(--shadow-1);
   transition:box-shadow .3s var(--ease), transform .3s var(--ease), border-color .3s;
@@ -158,7 +158,7 @@
 /* ---------- FILTER BAR (properties listing) ---------- */
 .filter-bar{
   display:flex; gap:14px; flex-wrap:wrap; align-items:center; padding:22px 24px;
-  background:var(--white); border:1px solid transparent; border-radius:var(--radius-l); box-shadow:var(--shadow-1); margin-bottom:36px;
+  background:var(--white); border:1px solid var(--line); border-radius:var(--radius-l); box-shadow:var(--shadow-1); margin-bottom:36px;
 }
 .filter-bar select,.filter-bar input{
   border:1px solid var(--line); background:var(--paper); padding:11px 14px; border-radius:var(--radius-s); font-size:.88rem; color:var(--ink);
@@ -177,7 +177,7 @@
 /* ---------- SERVICES ---------- */
 .svc-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
 .svc{
-  background:var(--white); border:1px solid transparent; border-radius:var(--radius-l);
+  background:var(--white); border:1px solid var(--line); border-radius:var(--radius-l);
   padding:38px 32px; box-shadow:var(--shadow-1);
   transition:box-shadow .3s var(--ease), transform .3s var(--ease), border-color .3s;
 }
@@ -212,7 +212,7 @@
 .pillars-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:20px; }
 .pillar{
   display:flex; align-items:flex-start; gap:16px; text-align:left;
-  background:var(--white); border:1px solid transparent; border-radius:var(--radius-l);
+  background:var(--white); border:1px solid var(--line); border-radius:var(--radius-l);
   padding:26px; box-shadow:var(--shadow-1);
   transition:box-shadow .3s var(--ease), transform .3s var(--ease), border-color .3s;
 }
@@ -236,7 +236,7 @@
 }
 
 /* ---------- DEVELOPMENTS ---------- */
-.dev-card{ background:var(--white); border:1px solid transparent; border-radius:var(--radius-l); overflow:hidden; box-shadow:var(--shadow-1); transition:box-shadow .35s var(--ease), transform .35s var(--ease); display:flex; flex-direction:column; height:100%; }
+.dev-card{ background:var(--white); border:1px solid var(--line); border-radius:var(--radius-l); overflow:hidden; box-shadow:var(--shadow-1); transition:box-shadow .35s var(--ease), transform .35s var(--ease); display:flex; flex-direction:column; height:100%; }
 .dev-card:hover{ box-shadow:var(--shadow-2); transform:translateY(-4px); }
 .dev-media{ position:relative; aspect-ratio:16/11; overflow:hidden; background:var(--paper-2); border-radius:var(--radius-l) var(--radius-l) 0 0; box-shadow:inset 0 0 0 3px var(--brand-orange); }
 .dev-media img{ width:100%; height:100%; object-fit:cover; transition:transform .7s var(--ease); }
@@ -257,7 +257,7 @@
 .about-hero{ display:grid; grid-template-columns:1.1fr .9fr; gap:56px; align-items:end; }
 .about-hero img{ border-radius:var(--radius-l); width:100%; aspect-ratio:4/5; object-fit:cover; border:3px solid var(--brand-orange); box-shadow:0 0 0 6px rgba(255,117,4,.1); transition:transform .5s var(--ease); }
 .about-hero:hover img{ transform:scale(1.02); }
-.mission-vision-card{ display:flex; flex-direction:column; gap:24px; background:var(--white); border:1px solid transparent; border-radius:var(--radius-l); box-shadow:var(--shadow-1); padding:28px; }
+.mission-vision-card{ display:flex; flex-direction:column; gap:24px; background:var(--white); border:1px solid var(--line); border-radius:var(--radius-l); box-shadow:var(--shadow-1); padding:28px; }
 .mission-vision-card p{ margin-top:10px; color:var(--charcoal-60); font-size:.92rem; line-height:1.65; }
 .team-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:24px 20px; margin-top:8px; }
 .team-card{ text-align:center; }
@@ -309,7 +309,7 @@
 
 /* ---------- CONTACT ---------- */
 .contact-grid{ display:grid; grid-template-columns:.9fr 1.1fr; gap:64px; }
-.contact-card{ background:var(--white); border:1px solid transparent; border-radius:var(--radius-l); box-shadow:var(--shadow-1); padding:36px; }
+.contact-card{ background:var(--white); border:1px solid var(--line); border-radius:var(--radius-l); box-shadow:var(--shadow-1); padding:36px; }
 .payment-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
 @media (max-width:700px){ .payment-grid{ grid-template-columns:1fr; } }
 .badge-note{ background:var(--white); border-left:3px solid var(--brand-orange); border-radius:6px; box-shadow:var(--shadow-1); padding:18px 22px; color:var(--charcoal); max-width:560px; }
@@ -421,7 +421,7 @@
 .feature-list li{ display:flex; align-items:center; gap:10px; font-size:.92rem; color:var(--charcoal); }
 .feature-list li::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--clay); flex:none; }
 
-.enquiry-box{ position:relative; background:var(--white); border:1px solid transparent; border-radius:var(--radius-l); box-shadow:var(--shadow-2); padding:28px; }
+.enquiry-box{ position:relative; background:var(--white); border:1px solid var(--line); border-radius:var(--radius-l); box-shadow:var(--shadow-2); padding:28px; }
 .enquiry-box .price{ font-family:var(--serif); font-size:1.8rem; color:var(--ink); }
 .enquiry-box .price-sub{ font-size:.82rem; color:var(--charcoal-60); margin-top:4px; }
 .enquiry-box .btn{ margin-top:12px; }
