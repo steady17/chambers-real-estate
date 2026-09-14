@@ -8,7 +8,12 @@
   overflow:hidden; color:var(--paper);
 }
 .hero-media{ position:absolute; inset:0; }
-.hero-media img{ width:100%; height:100%; object-fit:cover; animation:hero-kenburns 22s ease-in-out infinite alternate; }
+.hero-media img{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  opacity:0; transition:opacity 1.8s ease-in-out;
+  animation:hero-kenburns 18s ease-in-out infinite alternate;
+}
+.hero-media img.active{ opacity:1; z-index:1; }
 @keyframes hero-kenburns{
   from{ transform:scale(1) translate(0,0); }
   to{ transform:scale(1.09) translate(-1%,-1%); }
@@ -310,6 +315,8 @@
 /* ---------- CONTACT ---------- */
 .contact-grid{ display:grid; grid-template-columns:.9fr 1.1fr; gap:64px; }
 .contact-card{ background:var(--white); border:1px solid var(--line); border-radius:var(--radius-l); box-shadow:var(--shadow-1); padding:36px; }
+.video-embed{ position:relative; aspect-ratio:16/9; border-radius:var(--radius-l); overflow:hidden; box-shadow:var(--shadow-2); }
+.video-embed iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
 @media (max-width:600px){ .contact-card{ padding:22px; } }
 .payment-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
 @media (max-width:700px){ .payment-grid{ grid-template-columns:1fr; } }
