@@ -163,13 +163,13 @@ function adminTableRow(p){
   const statusClass = status.toLowerCase();
   return `
   <tr>
-    <td><img class="t-thumb" src="${p.image}" alt="${p.name}"></td>
-    <td><span class="t-name">${p.name}</span><br><span class="muted" style="font-size:.8rem">${p.type}</span></td>
-    <td>${p.location}</td>
-    <td>${p.price}</td>
-    <td><span class="status-pill ${statusClass}">${status}</span></td>
-    <td><button class="star-btn ${p.featured ? "on" : ""}" onclick="handleToggleFeatured('${p.id}')" title="Toggle featured">★</button></td>
-    <td>
+    <td data-label="Image"><img class="t-thumb" src="${p.image}" alt="${p.name}"></td>
+    <td data-label="Property"><span class="t-name">${p.name}</span><br><span class="muted" style="font-size:.8rem">${p.type}</span></td>
+    <td data-label="Location">${p.location}</td>
+    <td data-label="Price">${p.price}</td>
+    <td data-label="Status"><span class="status-pill ${statusClass}">${status}</span></td>
+    <td data-label="Featured"><button class="star-btn ${p.featured ? "on" : ""}" onclick="handleToggleFeatured('${p.id}')" title="Toggle featured">★</button></td>
+    <td data-label="Actions">
       <div class="t-actions">
         <a class="icon-btn" href="#add-property/${p.id}" title="Edit">${editIcon()}</a>
         <a class="icon-btn" href="../property.html?id=${p.id}" target="_blank" title="Preview">${eyeIcon()}</a>
@@ -247,12 +247,13 @@ async function handleImageFileSelect(inputEl){
   const submitBtn = document.querySelector("#property-form button[type=submit]");
   if(submitBtn) submitBtn.disabled = true;
   adminToast(`Uploading ${files.length} photo${files.length>1?"s":""}…`);
-  const urls = JSON.parse(document.getElementById("img-preview").dataset.urls || "[]");
+  const existingUrls = JSON.parse(document.getElementById("img-preview").dataset.urls || "[]");
+  const newUrls = [];
   for(const file of files){
     const url = await uploadPropertyImage(file);
-    if(url) urls.push(url);
+    if(url) newUrls.push(url);
   }
-  renderImagePreview(urls);
+  renderImagePreview([...newUrls, ...existingUrls]);
   inputEl.value = "";
   if(submitBtn) submitBtn.disabled = false;
   adminToast("Photos uploaded");
@@ -303,11 +304,11 @@ async function renderAdminDevelopments(){
   }
   tbody.innerHTML = devs.map(d => `
     <tr>
-      <td><img class="t-thumb" src="${d.image}" alt="${d.name}"></td>
-      <td><span class="t-name">${d.name}</span></td>
-      <td>${d.location}</td>
-      <td><span class="status-pill available">${d.status}</span></td>
-      <td>
+      <td data-label="Image"><img class="t-thumb" src="${d.image}" alt="${d.name}"></td>
+      <td data-label="Project"><span class="t-name">${d.name}</span></td>
+      <td data-label="Location">${d.location}</td>
+      <td data-label="Status"><span class="status-pill available">${d.status}</span></td>
+      <td data-label="Actions">
         <div class="t-actions">
           <a class="icon-btn" href="#add-development/${d.id}" title="Edit">${editIcon()}</a>
           <a class="icon-btn" href="../development.html?id=${d.id}" target="_blank" title="Preview">${eyeIcon()}</a>
@@ -367,12 +368,13 @@ async function handleDevImageFileSelect(inputEl){
   const submitBtn = document.querySelector("#development-form button[type=submit]");
   if(submitBtn) submitBtn.disabled = true;
   adminToast(`Uploading ${files.length} photo${files.length>1?"s":""}…`);
-  const urls = JSON.parse(document.getElementById("dimg-preview").dataset.urls || "[]");
+  const existingUrls = JSON.parse(document.getElementById("dimg-preview").dataset.urls || "[]");
+  const newUrls = [];
   for(const file of files){
     const url = await uploadPropertyImage(file);
-    if(url) urls.push(url);
+    if(url) newUrls.push(url);
   }
-  renderDevImagePreview(urls);
+  renderDevImagePreview([...newUrls, ...existingUrls]);
   inputEl.value = "";
   if(submitBtn) submitBtn.disabled = false;
   adminToast("Photos uploaded");
@@ -410,13 +412,13 @@ async function renderAdminEnquiries(){
   }
   tbody.innerHTML = list.map(e => `
     <tr>
-      <td><span class="t-name">${e.name}</span><br><span class="muted" style="font-size:.8rem">${e.phone}</span>${e.email ? `<br><span class="muted" style="font-size:.8rem">${e.email}</span>` : ""}</td>
-      <td>${e.property || "—"}</td>
-      <td>${e.purpose || "—"}</td>
-      <td style="max-width:280px">${e.message}</td>
-      <td>${e.date}</td>
-      <td><span class="status-pill ${e.status === "New" ? "available" : "sold"}">${e.status}</span></td>
-      <td><div class="t-actions"><button class="icon-btn danger" onclick="handleDeleteEnquiry('${e.id}', '${(e.name || "").replace(/'/g,"")}')" title="Delete">${trashIcon()}</button></div></td>
+      <td data-label="Contact"><span class="t-name">${e.name}</span><br><span class="muted" style="font-size:.8rem">${e.phone}</span>${e.email ? `<br><span class="muted" style="font-size:.8rem">${e.email}</span>` : ""}</td>
+      <td data-label="Property">${e.property || "—"}</td>
+      <td data-label="Looking to">${e.purpose || "—"}</td>
+      <td data-label="Message" style="max-width:280px">${e.message}</td>
+      <td data-label="Date">${e.date}</td>
+      <td data-label="Status"><span class="status-pill ${e.status === "New" ? "available" : "sold"}">${e.status}</span></td>
+      <td data-label="Actions"><div class="t-actions"><button class="icon-btn danger" onclick="handleDeleteEnquiry('${e.id}', '${(e.name || "").replace(/'/g,"")}')" title="Delete">${trashIcon()}</button></div></td>
     </tr>`).join("");
 }
 async function handleDeleteEnquiry(id, name){
@@ -435,13 +437,13 @@ async function renderAdminListings(){
   }
   tbody.innerHTML = list.map((l,i) => `
     <tr onclick="toggleListingDetail(${i})" style="cursor:pointer">
-      <td><span class="t-name">${l.owner_name}</span><br><span class="muted" style="font-size:.8rem">${l.owner_phone}</span></td>
-      <td style="max-width:220px">${l.address}</td>
-      <td>${l.purpose || "—"}</td>
-      <td>${l.package || "—"}</td>
-      <td>${new Date(l.created_at).toLocaleDateString()}</td>
-      <td><span class="status-pill ${l.status === "New" ? "available" : "sold"}">${l.status}</span></td>
-      <td><div class="t-actions"><button class="icon-btn danger" onclick="event.stopPropagation(); handleDeleteListing('${l.id}', '${(l.owner_name || "").replace(/'/g,"")}')" title="Delete">${trashIcon()}</button></div></td>
+      <td data-label="Owner"><span class="t-name">${l.owner_name}</span><br><span class="muted" style="font-size:.8rem">${l.owner_phone}</span></td>
+      <td data-label="Property" style="max-width:220px">${l.address}</td>
+      <td data-label="Purpose">${l.purpose || "—"}</td>
+      <td data-label="Package">${l.package || "—"}</td>
+      <td data-label="Date">${new Date(l.created_at).toLocaleDateString()}</td>
+      <td data-label="Status"><span class="status-pill ${l.status === "New" ? "available" : "sold"}">${l.status}</span></td>
+      <td data-label="Actions"><div class="t-actions"><button class="icon-btn danger" onclick="event.stopPropagation(); handleDeleteListing('${l.id}', '${(l.owner_name || "").replace(/'/g,"")}')" title="Delete">${trashIcon()}</button></div></td>
     </tr>
     <tr id="listing-detail-${i}" style="display:none"><td colspan="7" style="background:var(--paper-2); padding:22px">${listingDetailHTML(l)}</td></tr>`).join("");
 }
