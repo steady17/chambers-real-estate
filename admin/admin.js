@@ -75,6 +75,16 @@ async function adminGetListings(){
   if(error){ console.error(error); adminToast("Could not load listing submissions — check your connection"); return []; }
   return data;
 }
+async function adminGetSearches(){
+  const { data, error } = await chambersDB.from("search_requests").select("*").order("created_at", { ascending:false });
+  if(error){ console.error(error); adminToast("Could not load search requests — check your connection"); return []; }
+  return data;
+}
+async function adminDeleteSearch(id){
+  const { error } = await chambersDB.from("search_requests").delete().eq("id", id);
+  if(error){ console.error(error); adminToast("Delete failed — check your connection"); return false; }
+  return true;
+}
 async function adminDeleteProperty(id){
   const { error } = await chambersDB.from("properties").delete().eq("id", id);
   if(error){ console.error(error); adminToast("Delete failed — check your connection"); return false; }
@@ -103,7 +113,7 @@ async function uploadPropertyImage(file){
 }
 
 /* ---------- Router ---------- */
-const ADMIN_VIEWS = ["dashboard","properties","add-property","developments","add-development","enquiries","listings","settings"];
+const ADMIN_VIEWS = ["dashboard","properties","add-property","developments","add-development","enquiries","listings","searches","settings"];
 
 async function adminRoute(){
   const hash = (location.hash || "#dashboard").replace("#","");
@@ -118,6 +128,7 @@ async function adminRoute(){
   if(view === "add-development") await renderAdminDevelopmentForm(hash.split("/")[1] || null);
   if(view === "enquiries") await renderAdminEnquiries();
   if(view === "listings") await renderAdminListings();
+  if(view === "searches") await renderAdminSearches();
   if(view === "settings") await renderAdminSettingsForm();
 }
 window.addEventListener("hashchange", adminRoute);
@@ -127,12 +138,14 @@ async function renderAdminDashboard(){
   const props = await adminGetProperties();
   const enquiries = await adminGetEnquiries();
   const listings = await adminGetListings();
+  const searches = await adminGetSearches();
   const total = props.length;
   const available = props.filter(p => (p.status || p.availability) === "Available").length;
   const soldRented = props.filter(p => ["Sold","Rented"].includes(p.status || p.availability)).length;
   const featured = props.filter(p => p.featured).length;
   const newEnq = enquiries.filter(e => e.status === "New").length;
   const newListings = listings.filter(l => l.status === "New").length;
+  const newSearches = searches.filter(s => s.status === "New").length;
 
   document.getElementById("stat-total").textContent = total;
   document.getElementById("stat-available").textContent = available;
@@ -140,6 +153,7 @@ async function renderAdminDashboard(){
   document.getElementById("stat-featured").textContent = featured;
   document.getElementById("stat-enquiries").textContent = newEnq;
   document.getElementById("stat-listings").textContent = newListings;
+  document.getElementById("stat-searches").textContent = newSearches;
 
   const recent = props.slice(0,5);
   document.getElementById("dash-recent").innerHTML = recent.length
@@ -256,7 +270,9 @@ async function handleImageFileSelect(inputEl){
   renderImagePreview([...newUrls, ...existingUrls]);
   inputEl.value = "";
   if(submitBtn) submitBtn.disabled = false;
-  adminToast("Photos uploaded");
+  if(newUrls.length === files.length) adminToast("Photos uploaded");
+  else if(newUrls.length > 0) adminToast(`Only ${newUrls.length} of ${files.length} photos uploaded — check your connection and try the rest again`);
+  else adminToast("Upload failed — none of the photos were saved. Check your connection and try again.");
 }
 
 async function submitPropertyForm(e){
@@ -377,7 +393,9 @@ async function handleDevImageFileSelect(inputEl){
   renderDevImagePreview([...newUrls, ...existingUrls]);
   inputEl.value = "";
   if(submitBtn) submitBtn.disabled = false;
-  adminToast("Photos uploaded");
+  if(newUrls.length === files.length) adminToast("Photos uploaded");
+  else if(newUrls.length > 0) adminToast(`Only ${newUrls.length} of ${files.length} photos uploaded — check your connection and try the rest again`);
+  else adminToast("Upload failed — none of the photos were saved. Check your connection and try again.");
 }
 
 async function submitDevelopmentForm(e){
@@ -465,6 +483,44 @@ function listingDetailHTML(l){
     ["Custodian contact", l.custodian_contact], ["Agrees to terms", l.agrees_to_terms], ["Reason if disagreed", l.disagree_reason],
   ].filter(([,v]) => v);
   return `<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; font-size:.86rem;">${rows.map(([k,v]) => `<div><b>${k}:</b><br>${v}</div>`).join("")}</div>`;
+}
+
+/* ---------- Search requests ---------- */
+async function renderAdminSearches(){
+  const list = await adminGetSearches();
+  const tbody = document.getElementById("admin-search-rows");
+  if(!list.length){
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--charcoal-60)">No search requests yet.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map((s,i) => `
+    <tr onclick="toggleSearchDetail(${i})" style="cursor:pointer">
+      <td data-label="Name"><span class="t-name">${s.full_name}</span><br><span class="muted" style="font-size:.8rem">${s.whatsapp}</span></td>
+      <td data-label="Location">${s.location}</td>
+      <td data-label="Category">${s.category || "—"}</td>
+      <td data-label="Budget">${s.budget_1 || "—"}</td>
+      <td data-label="Date">${new Date(s.created_at).toLocaleDateString()}</td>
+      <td data-label="Status"><span class="status-pill ${s.status === "New" ? "available" : "sold"}">${s.status}</span></td>
+      <td data-label="Actions"><div class="t-actions"><button class="icon-btn danger" onclick="event.stopPropagation(); handleDeleteSearch('${s.id}', '${(s.full_name || "").replace(/'/g,"")}')" title="Delete">${trashIcon()}</button></div></td>
+    </tr>
+    <tr id="search-detail-${i}" style="display:none"><td colspan="7" style="background:var(--paper-2); padding:22px">${searchDetailHTML(s)}</td></tr>`).join("");
+}
+function toggleSearchDetail(i){
+  const row = document.getElementById("search-detail-" + i);
+  row.style.display = row.style.display === "none" ? "table-row" : "none";
+}
+function searchDetailHTML(s){
+  const rows = [
+    ["Category (other)", s.category_other], ["Description", s.description],
+    ["Budget (2)", s.budget_2], ["Budget (3)", s.budget_3], ["Timeline", s.timeline],
+    ["Agrees to terms", s.agrees_to_terms], ["Terms (other)", s.terms_other], ["Agrees to payment", s.agrees_to_payment],
+  ].filter(([,v]) => v);
+  return `<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; font-size:.86rem;">${rows.map(([k,v]) => `<div><b>${k}:</b><br>${v}</div>`).join("")}</div>`;
+}
+async function handleDeleteSearch(id, name){
+  if(!confirm(`Delete the search request from ${name}? This cannot be undone.`)) return;
+  await adminDeleteSearch(id);
+  await renderAdminSearches();
 }
 
 /* ---------- Settings form ---------- */
