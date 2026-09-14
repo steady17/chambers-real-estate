@@ -310,6 +310,7 @@
 /* ---------- CONTACT ---------- */
 .contact-grid{ display:grid; grid-template-columns:.9fr 1.1fr; gap:64px; }
 .contact-card{ background:var(--white); border:1px solid var(--line); border-radius:var(--radius-l); box-shadow:var(--shadow-1); padding:36px; }
+@media (max-width:600px){ .contact-card{ padding:22px; } }
 .payment-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
 @media (max-width:700px){ .payment-grid{ grid-template-columns:1fr; } }
 .badge-note{ background:var(--white); border-left:3px solid var(--brand-orange); border-radius:6px; box-shadow:var(--shadow-1); padding:18px 22px; color:var(--charcoal); max-width:560px; }
