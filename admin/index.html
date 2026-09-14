@@ -26,6 +26,7 @@
       <a href="#add-development" data-view="add-development">Add development</a>
       <a href="#enquiries" data-view="enquiries">Enquiries</a>
       <a href="#listings" data-view="listings">Listing Submissions</a>
+      <a href="#searches" data-view="searches">Search Requests</a>
       <a href="#settings" data-view="settings">Settings</a>
       <a href="#" id="logout-link" onclick="handleLogout(event)">Log out</a>
       <div class="divider"></div>
@@ -49,6 +50,7 @@
         <div class="stat-card"><b id="stat-featured">0</b><span>Featured</span></div>
         <div class="stat-card"><b id="stat-enquiries">0</b><span>New enquiries</span></div>
         <div class="stat-card"><b id="stat-listings">0</b><span>New listing submissions</span></div>
+        <div class="stat-card"><b id="stat-searches">0</b><span>New search requests</span></div>
       </div>
       <div class="admin-panel">
         <div class="admin-panel-head"><h3>Recently added</h3><a href="#properties" class="btn btn-ghost btn-sm">View all</a></div>
@@ -221,6 +223,19 @@
         <table class="admin-table">
           <thead><tr><th>Owner</th><th>Property</th><th>Purpose</th><th>Package</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody id="admin-listing-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SEARCH REQUESTS -->
+    <section class="admin-view" id="view-searches" style="display:none">
+      <div class="admin-topbar">
+        <div><h1>Search Requests</h1><p>People who submitted the "Property Search" form.</p></div>
+      </div>
+      <div class="admin-panel">
+        <table class="admin-table">
+          <thead><tr><th>Name</th><th>Location</th><th>Category</th><th>Budget</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="admin-search-rows"></tbody>
         </table>
       </div>
     </section>
