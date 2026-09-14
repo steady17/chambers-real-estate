@@ -20,7 +20,7 @@
 .admin-topbar h1{ font-size:1.7rem; }
 .admin-topbar p{ color:var(--charcoal-60); font-size:.9rem; margin-top:4px; }
 
-.stat-cards{ display:grid; grid-template-columns:repeat(6,1fr); gap:16px; margin-bottom:34px; }
+.stat-cards{ display:grid; grid-template-columns:repeat(7,1fr); gap:16px; margin-bottom:34px; }
 .stat-card{ background:var(--white); border:1px solid var(--line); border-radius:6px; padding:20px; }
 .stat-card b{ display:block; font-family:var(--serif); font-size:1.8rem; color:var(--brand-orange); }
 .stat-card span{ font-size:.8rem; color:var(--charcoal-60); }
