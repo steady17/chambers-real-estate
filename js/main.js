@@ -275,6 +275,8 @@ async function handleContactSubmit(e){
     return;
   }
 
+  chambersDB.functions.invoke("send-alert-email", { body: { table: "enquiries", record: enquiry } }).catch(err => console.warn("Alert email did not send:", err));
+
   btn.textContent = "Message sent";
   e.target.reset();
   setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2200);
