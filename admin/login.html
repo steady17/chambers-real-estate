@@ -6,6 +6,11 @@
 <title>Admin Login | Chambers Real Estate</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="../img/logo-symbol-dark.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="../img/icon-apple-touch.png">
+<meta name="theme-color" content="#5C2A20">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Chambers Admin">
 <link rel="stylesheet" href="../css/base.css">
 <link rel="stylesheet" href="../css/site.css">
 <link rel="stylesheet" href="admin.css">
@@ -29,12 +34,32 @@
     </div>
     <div id="login-error" style="display:none; color:#B3261E; font-size:.85rem; margin-bottom:16px;"></div>
     <button type="submit" class="btn btn-primary btn-block">Log in</button>
+    <div style="text-align:center; margin-top:16px;">
+      <a href="#" onclick="handleForgotPassword(event)" style="font-size:.85rem; color:var(--charcoal-60);">Forgot password?</a>
+    </div>
   </form>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase-config.js"></script>
 <script>
+async function handleForgotPassword(e){
+  e.preventDefault();
+  const email = document.getElementById("login-email").value;
+  if(!email){
+    alert("Type your email address into the box above first, then tap \"Forgot password?\" again.");
+    return;
+  }
+  const { error } = await chambersDB.auth.resetPasswordForEmail(email, {
+    redirectTo: location.origin + "/admin/reset-password.html"
+  });
+  if(error){
+    alert("Couldn't send reset email — " + error.message);
+    return;
+  }
+  alert("Check your email for a link to reset your password.");
+}
+
 async function handleLogin(e){
   e.preventDefault();
   const btn = e.target.querySelector("button[type=submit]");
