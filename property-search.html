@@ -215,6 +215,8 @@
       return;
     }
 
+    chambersDB.functions.invoke("send-alert-email", { body: { table: "search_requests", record: submission } }).catch(err => console.warn("Alert email did not send:", err));
+
     btn.textContent = "Request submitted";
     e.target.reset();
     setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2200);
